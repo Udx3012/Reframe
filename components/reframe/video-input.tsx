@@ -37,19 +37,14 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
 
   // Derived States: Mode and Validation
   const hasMedia = !!(videoFile || (videoUrl && detectedPlatform && !urlError));
-  const hasText = !!description.trim();
   
-  const mode: 'enhancement' | 'fallback' | null = hasMedia
-    ? (hasText ? 'enhancement' : null)
-    : (hasText ? 'fallback' : null);
+  const mode: 'enhancement' | null = hasMedia && description.trim() ? 'enhancement' : null;
 
-  const primaryType: 'video' | 'url' | 'description' | null = videoFile
+  const primaryType: 'video' | 'url' | null = videoFile
     ? 'video'
     : (videoUrl && detectedPlatform && !urlError)
       ? 'url'
-      : hasText
-        ? 'description'
-        : null;
+      : null;
 
   // Propagate state changes to parent layout
   useEffect(() => {
@@ -71,14 +66,12 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
       isValid = true;
     } else if (videoUrl && !urlError && detectedPlatform) {
       isValid = true;
-    } else if (hasText && !videoFile && !videoUrl) {
-      isValid = true;
     }
 
     if (onValidationChange) {
       onValidationChange(isValid);
     }
-  }, [videoFile, videoUrl, fileError, urlError, detectedPlatform, hasText, onValidationChange]);
+  }, [videoFile, videoUrl, fileError, urlError, detectedPlatform, onValidationChange]);
 
   // Clean object URL on unmount
   useEffect(() => {
@@ -189,7 +182,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
       
       {/* Title & info */}
       <div className="space-y-1">
-        <label className="text-[11px] font-mono font-medium uppercase tracking-wider text-neutral-400 block">
+        <label className="text-[12px] font-mono font-bold uppercase tracking-wider text-foreground block">
           Asset Ingestion Console
         </label>
         <p className="text-sm text-neutral-500 leading-relaxed">
@@ -200,7 +193,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
       {/* 1. Upload Video File (Primary Ingest) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-neutral-400">
+          <label className="flex items-center gap-1.5 text-[12px] font-mono font-bold text-foreground animate-pulse-subtle">
             <span className={`h-1.5 w-1.5 rounded-full ${videoFile ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]' : 'bg-neutral-800'}`} />
             1. UPLOAD VIDEO (PRIMARY)
           </label>
@@ -250,20 +243,20 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
             className={`border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300 group ${
               isDragging 
                 ? 'border-emerald-500 bg-emerald-950/5' 
-                : 'border-white/20 bg-white/[0.025] hover:border-white/40 hover:bg-white/[0.045] hover:shadow-[inset_0_0_15px_rgba(255,255,255,0.06)]'
+                : 'border-neutral-900 bg-neutral-950/20 hover:border-neutral-750 hover:bg-neutral-950/50 hover:shadow-[inset_0_0_15px_rgba(255,255,255,0.02)]'
             } ${videoUrl ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}
             role="button"
             tabIndex={videoUrl ? -1 : 0}
             aria-label="Upload raw video file"
           >
             {/* Highly polished circular glass container for the upload icon */}
-            <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neutral-400 group-hover:scale-105 group-hover:bg-white/10 group-hover:border-white/20 transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
-              <UploadCloud className="size-5 text-white/70 group-hover:text-white" />
+            <div className="w-12 h-12 rounded-full bg-neutral-900/10 border border-neutral-900/20 flex items-center justify-center text-neutral-400 group-hover:scale-105 group-hover:bg-neutral-900/30 group-hover:border-neutral-900/40 transition-all duration-300 shadow-[0_2px_10px_rgba(0,0,0,0.1)]">
+              <UploadCloud className="size-5 text-foreground/70 group-hover:text-foreground" />
             </div>
             <div className="text-center select-none space-y-0.5">
-              <span className="text-sm font-medium text-neutral-200 block group-hover:text-white transition-colors">Drag & drop video here</span>
+              <span className="text-sm font-medium text-foreground/80 block group-hover:text-foreground transition-colors">Drag & drop video here</span>
               <span className="text-xs text-neutral-500 block group-hover:text-neutral-400 transition-colors">or click to browse local files</span>
-              <span className="text-[9px] text-neutral-600 block mt-2 font-mono uppercase tracking-wider">MP4, MOV, WEBM • MAX 200MB</span>
+              <span className="text-[9px] text-neutral-500 block mt-2 font-mono uppercase tracking-wider">MP4, MOV, WEBM • MAX 200MB</span>
             </div>
           </div>
         )}
@@ -286,7 +279,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
       {/* 2. social Video URL (Secondary Ingest) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label htmlFor="url-input-field" className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-neutral-400">
+          <label htmlFor="url-input-field" className="flex items-center gap-1.5 text-[12px] font-mono font-bold text-foreground">
             <span className={`h-1.5 w-1.5 rounded-full ${videoUrl && detectedPlatform && !urlError ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]' : 'bg-neutral-800'}`} />
             2. PASTE VIDEO URL (SECONDARY)
           </label>
@@ -311,13 +304,13 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
             onChange={(e) => handleUrlChange(e.target.value)}
             disabled={!!videoFile}
             placeholder="YouTube, TikTok, or Instagram Reels link..."
-            className="w-full text-sm bg-neutral-950/60 border border-white/10 rounded-lg pl-9 pr-24 py-2.5 text-neutral-200 placeholder-neutral-750 focus:border-white/30 focus:ring-1 focus:ring-white/20 outline-none font-mono transition-all duration-250"
+            className="w-full text-sm bg-neutral-950/60 border border-neutral-900 rounded-lg pl-9 pr-24 py-2.5 text-foreground placeholder-neutral-500 focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700/20 outline-none font-mono transition-all duration-250"
             aria-invalid={!!urlError}
           />
           
           {detectedPlatform && !urlError && (
             <div className="absolute inset-y-0 right-3 flex items-center gap-1.5 select-none">
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 flex items-center gap-1 animate-in fade-in duration-200">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-in fade-in duration-200">
                 <CheckCircle2 className="size-2.5" />
                 {detectedPlatform}
               </span>
@@ -336,26 +329,13 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
       {/* Integration details separator */}
       <div className="h-px bg-neutral-900" />
 
-      {/* 3. Description & Context (Always available, modes change dynamically) */}
+      {/* 3. Description & Context (Optional extra description) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label htmlFor="description-textarea" className="text-[11px] font-mono font-medium uppercase tracking-wider text-neutral-400 flex items-center gap-1">
-            3. CREATOR DESCRIPTION & CONTEXT
+          <label htmlFor="description-textarea" className="text-[12px] font-mono font-bold uppercase tracking-wider text-foreground flex items-center gap-1">
+            3. EXTRA DESCRIPTION (OPTIONAL)
           </label>
           <div className="flex items-center gap-2 select-none">
-            {/* Mode Tag badges */}
-            {mode === 'enhancement' && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/20 border border-emerald-900/35 text-emerald-400 flex items-center gap-1 animate-in fade-in duration-200">
-                <Sparkles className="size-2.5" />
-                Enhancement Active
-              </span>
-            )}
-            {mode === 'fallback' && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-950/20 border border-blue-900/35 text-blue-400 flex items-center gap-1 animate-in fade-in duration-200">
-                <BookOpen className="size-2.5" />
-                Fallback Active
-              </span>
-            )}
             <span className={`text-[10px] font-mono ${description.length > 500 ? 'text-rose-500 font-bold' : 'text-neutral-600'}`}>
               {description.length} / 500
             </span>
@@ -368,21 +348,15 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
           maxLength={500}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder={
-            hasMedia 
-              ? "Enhancement Mode: Enter brand rules, target keywords, or styling context overrides to analyze alongside the media..." 
-              : "Fallback Mode: No media detected. Write a script, transcript, or topic outline to generate reports directly from text."
-          }
-          className="w-full text-sm bg-neutral-950/60 border border-white/10 rounded-lg p-3 text-neutral-200 placeholder-neutral-750 focus:border-white/30 focus:ring-1 focus:ring-white/20 outline-none resize-none leading-relaxed transition-all duration-250"
+          placeholder="Enter brand rules, target keywords, or styling context overrides to analyze alongside the media..."
+          className="w-full text-sm bg-neutral-950/60 border border-neutral-900 rounded-lg p-3 text-foreground placeholder-neutral-500 focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700/20 outline-none resize-none leading-relaxed transition-all duration-250"
         />
 
-        {/* Dynamic Context mode descriptor text */}
+        {/* Supplemental description context helper */}
         <div className="flex items-start gap-1.5 text-sm text-neutral-500 leading-normal font-sans">
-          <HelpCircle className="size-3.5 shrink-0 mt-0.5 text-neutral-650" />
+          <HelpCircle className="size-3.5 shrink-0 mt-0.5 text-neutral-500" />
           <span>
-            {hasMedia 
-              ? "Your description will act as supplemental context, reinforcing the Gemini visual analyses." 
-              : "No video file or URL detected. Your text will be analyzed as the primary source brief."}
+            Your description will act as supplemental context, reinforcing the AI visual analyses.
           </span>
         </div>
       </div>

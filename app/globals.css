@@ -35,6 +35,30 @@
   /* Easing curves (Vercel/Linear Signature physics) */
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-premium: all 350ms var(--ease-premium);
+  --card-shadow: rgba(0, 0, 0, 0.8);
+}
+
+.light {
+  /* Light Canvas Background & Surfaces */
+  --background: oklch(0.98 0 0);             /* Pure light gray-white */
+  --foreground: oklch(0.08 0 0);             /* High contrast dark text */
+  
+  /* Neutral Palette (Light Hierarchy) */
+  --neutral-950: oklch(0.94 0 0);            /* Card backgrounds (very light gray) */
+  --neutral-900: oklch(0.88 0 0);            /* Borders / inputs (soft gray) */
+  --neutral-850: oklch(0.80 0 0);            /* Separators */
+  --neutral-800: oklch(0.72 0 0);            /* Active states */
+  --neutral-700: oklch(0.60 0 0);            /* Inline buttons / controls */
+  --neutral-600: oklch(0.48 0 0);            /* Muted labels */
+  --neutral-500: oklch(0.38 0 0);            /* Secondary / placeholder text */
+  --neutral-400: oklch(0.24 0 0);            /* Body copy */
+  --neutral-300: oklch(0.14 0 0);            /* Elevated details */
+
+  /* Brand Accents (Light Mode optimized green) */
+  --accent-emerald: oklch(0.55 0.16 150);
+  --accent-emerald-hover: oklch(0.48 0.14 150);
+  --accent-emerald-dark: oklch(0.88 0.08 150);
+  --card-shadow: rgba(0, 0, 0, 0.04);
 }
 
 /* ==========================================
@@ -144,18 +168,18 @@
   .card-premium {
     position: relative;
     border: 1px solid var(--neutral-900);
-    background: linear-gradient(180deg, oklch(0.04 0 0 / 80%) 0%, oklch(0.02 0 0 / 40%) 100%);
+    background: linear-gradient(180deg, var(--neutral-950) 0%, var(--neutral-900) 100%);
     border-radius: var(--radius-lg);
     padding: 1.25rem;
     backdrop-filter: blur(12px);
     transition: var(--transition-premium);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 4px 30px var(--card-shadow);
   }
 
   .card-premium:hover {
     border-color: var(--neutral-800);
     transform: translateY(-1px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 1px 1px oklch(1 0 0 / 3%) inset;
+    box-shadow: 0 10px 40px var(--card-shadow), 0 0 1px 1px oklch(1 0 0 / 3%) inset;
   }
 
   /* 2. Premium Inputs (Linear Aesthetic) */

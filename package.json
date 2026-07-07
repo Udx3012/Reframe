@@ -2,7 +2,7 @@
   "name": "reframe",
   "version": "1.0.0",
   "private": true,
-  "description": "A focused video brief tool that parses reference videos and returns structured creative briefs using Gemini AI.",
+  "description": "A focused video brief tool that parses reference videos and returns structured creative briefs using AI.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

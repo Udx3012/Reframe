@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Eye, Clock, Calendar } from 'lucide-react';
 import { ReframeOutput } from '@/lib/types';
+import { motion } from 'framer-motion';
 
 interface BriefCardProps {
   data: ReframeOutput;
@@ -43,236 +44,203 @@ export default function BriefCard({ data }: BriefCardProps): React.JSX.Element {
     }
   };
 
+  // Entry transitions for a premium, lightweight feel
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }
+  };
+
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-xl border border-neutral-800 bg-[#0c0c0e] overflow-hidden shadow-2xl">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="w-full max-w-2xl mx-auto rounded-[32px] border border-neutral-900 bg-neutral-950 overflow-hidden shadow-2xl space-y-8 pb-8"
+    >
       {/* Thumbnail or placeholder */}
       {data.thumbnail ? (
-        <Image
-          src={data.thumbnail}
-          alt={data.title || 'Video Thumbnail'}
-          width={640}
-          height={180}
-          unoptimized
-          className="w-full h-[180px] object-cover"
-        />
-      ) : (
-        <div className="w-full h-[180px] bg-neutral-900 border-b border-neutral-800 flex items-center justify-center text-neutral-500 text-sm">
-          No Thumbnail Available (Uploaded File)
+        <div className="relative w-full h-[220px] overflow-hidden">
+          <Image
+            src={data.thumbnail}
+            alt={data.title || 'Video Thumbnail'}
+            width={640}
+            height={220}
+            unoptimized
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
         </div>
+      ) : (
+        <div className="w-full h-[100px] border-b border-neutral-900 bg-neutral-900/10" />
       )}
 
-      {/* Card Body */}
-      <div className="p-6 space-y-5">
+      {/* Card Content Area - Spacious Layout */}
+      <div className="px-8 sm:px-10 space-y-8">
+        
         {/* Title & Metadata */}
-        <div className="space-y-1">
+        <motion.div variants={itemVariants} className="space-y-4">
           {data.title && (
-            <h2 className="text-[15px] font-medium text-white tracking-tight leading-snug">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-tight leading-snug">
               {data.title}
             </h2>
           )}
+          
           {showMetaRow && (
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-neutral-400 font-normal">
-              {(() => {
-                const parts: React.ReactNode[] = [];
-                if (data.viewCount) {
-                  parts.push(
-                    <span key="views" className="flex items-center gap-1.5">
-                      <span>{data.viewCount}</span>
-                      {data.engagementSignal && (
-                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full border leading-none ${
-                          data.engagementSignal === 'High'
-                            ? 'bg-emerald-950/45 text-emerald-500 border-emerald-900/40'
-                            : data.engagementSignal === 'Medium'
-                            ? 'bg-amber-950/45 text-amber-500 border-amber-900/40'
-                            : 'bg-rose-950/45 text-rose-500 border-rose-900/40'
-                        }`}>
-                          {data.engagementSignal}
-                        </span>
-                      )}
-                    </span>
-                  );
-                }
-                if (data.duration) {
-                  parts.push(<span key="duration">{data.duration}</span>);
-                }
-                if (data.category) {
-                  parts.push(<span key="category">{data.category}</span>);
-                }
-                if (data.publishedAt) {
-                  parts.push(<span key="published">{data.publishedAt}</span>);
-                }
-
-                return parts.reduce((acc, curr, index) => {
-                  if (index === 0) return [curr];
-                  return [...(acc as React.ReactNode[]), <span key={`dot-${index}`} className="text-neutral-600">·</span>, curr];
-                }, [] as React.ReactNode[]);
-              })()}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-neutral-500 font-mono">
+              {data.viewCount && (
+                <span className="flex items-center gap-1">
+                  <Eye className="size-3.5" />
+                  <span>{data.viewCount}</span>
+                </span>
+              )}
+              {data.duration && (
+                <span className="flex items-center gap-1">
+                  <Clock className="size-3.5" />
+                  <span>{data.duration}</span>
+                </span>
+              )}
+              {data.publishedAt && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="size-3.5" />
+                  <span>{data.publishedAt}</span>
+                </span>
+              )}
+              {data.engagementSignal && (
+                <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border leading-none ${
+                  data.engagementSignal === 'High'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                    : data.engagementSignal === 'Medium'
+                    ? 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                    : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
+                }`}>
+                  {data.engagementSignal} Rating
+                </span>
+              )}
             </div>
           )}
-        </div>
 
-        {/* Tags Row */}
-        {data.tags && data.tags.length > 0 && (
-          <div className="space-y-1 pb-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Tags
-            </span>
-            <div className="flex flex-wrap gap-1.5">
+          {/* Tags cloud */}
+          {data.tags && data.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1 max-h-[100px] overflow-y-auto pr-2 scrollbar-thin">
               {data.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-[10px] px-2 py-0.5 bg-neutral-900 border border-neutral-800 rounded-[4px] text-neutral-300 font-mono"
+                  className="text-[10px] px-2.5 py-0.5 bg-neutral-900 border border-neutral-900 rounded-full text-foreground/75 font-mono hover:text-foreground hover:border-neutral-700 transition-colors"
                 >
-                  {tag}
+                  #{tag}
                 </span>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </motion.div>
 
         {/* Divider */}
-        <hr className="border-neutral-800" />
+        <hr className="border-neutral-900" />
 
-        {/* 2-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-          {/* Topic */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
+        {/* SECTION 1: Creative Intent (Topic & Hook) */}
+        <motion.div variants={itemVariants} className="space-y-6">
+          <div className="space-y-2">
+            <span className="block text-xs uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400 font-mono">
               Topic
             </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-normal">
               {data.topic}
-            </span>
-          </div>
-
-          {/* Hook */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Hook
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal">
-              {data.hook}
-            </span>
-          </div>
-
-          {/* Caption Style */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Caption Style
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.caption_style}
-            </span>
-          </div>
-
-          {/* Motion Profile */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Motion Profile
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.motion_profile}
-            </span>
-          </div>
-
-          {/* Pacing */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Pacing
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.pacing}
-            </span>
-          </div>
-
-          {/* Energy */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Energy
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.energy}
-            </span>
-          </div>
-
-          {/* Sound Design */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Sound Design
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.sound_design}
-            </span>
-          </div>
-
-          {/* Color Palette */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Color Palette
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.color_palette}
-            </span>
-          </div>
-
-          {/* Text Density */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Text Density
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.text_density}
-            </span>
-          </div>
-
-          {/* Framing */}
-          <div className="space-y-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Framing
-            </span>
-            <span className="block text-[14px] text-neutral-200 leading-relaxed font-normal capitalize">
-              {data.framing}
-            </span>
-          </div>
-        </div>
-
-        {/* Style Summary Section & Copy Button */}
-        <div className="pt-4 border-t border-neutral-900 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="space-y-1 flex-1">
-            <span className="block text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-              Style Summary
-            </span>
-            <p className="text-[15px] text-neutral-100 leading-relaxed font-normal">
-              {data.style_summary}
             </p>
           </div>
+
+          <div className="space-y-2">
+            <span className="block text-xs uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400 font-mono">
+              Hook
+            </span>
+            <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-normal">
+              {data.hook}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Divider */}
+        <hr className="border-neutral-900" />
+
+        {/* SECTION 2: Technical Parameters Blueprint */}
+        <motion.div variants={itemVariants} className="space-y-6">
+          <span className="block text-xs uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400 font-mono">
+            Style Parameter Blueprint
+          </span>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
+            {[
+              { label: 'Caption Style', val: data.caption_style },
+              { label: 'Motion Profile', val: data.motion_profile },
+              { label: 'Pacing Rate', val: data.pacing },
+              { label: 'Energy Profile', val: data.energy },
+              { label: 'Sound Design', val: data.sound_design },
+              { label: 'Color Palette', val: data.color_palette },
+              { label: 'Text Density', val: data.text_density },
+              { label: 'Framing Aspect', val: data.framing }
+            ].map((param, i) => (
+              <div key={i} className="flex flex-col gap-1 border-b border-neutral-900 pb-3">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-neutral-500">{param.label}</span>
+                <span className="text-xs sm:text-[13px] font-medium text-foreground capitalize mt-0.5 select-all">
+                  {param.val}
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Divider */}
+        <hr className="border-neutral-900" />
+
+        {/* SECTION 3: Executive Summary */}
+        <motion.div variants={itemVariants} className="space-y-2">
+          <span className="block text-xs uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400 font-mono">
+            Style Summary
+          </span>
+          <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed font-normal">
+            {data.style_summary}
+          </p>
+        </motion.div>
+
+        {/* Copy Action Button */}
+        <motion.div variants={itemVariants} className="pt-2">
           <button
             onClick={handleCopy}
-            className="self-end sm:self-auto px-4 py-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-white rounded-lg text-xs font-medium cursor-pointer transition-all duration-200 flex items-center gap-1.5 active:scale-[0.98] shrink-0"
+            className="w-full py-4 bg-foreground text-background hover:opacity-90 font-bold rounded-xl text-sm cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.985] shadow-lg"
           >
             {copied ? (
               <>
-                <Check className="size-3.5 text-emerald-500 animate-in fade-in zoom-in duration-200" />
-                <span className="text-emerald-400">Copied!</span>
+                <Check className="size-4 animate-in fade-in zoom-in duration-200" />
+                <span>Brief Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="size-3.5 text-neutral-400" />
-                <span>Copy Brief</span>
+                <Copy className="size-4" />
+                <span>Copy Full Brief</span>
               </>
             )}
           </button>
-        </div>
+        </motion.div>
+
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export function BriefCardSkeleton(): React.JSX.Element {
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-xl border border-neutral-850 bg-[#0c0c0e] overflow-hidden shadow-2xl animate-pulse">
+    <div className="w-full max-w-2xl mx-auto rounded-xl border border-neutral-900 bg-neutral-950 overflow-hidden shadow-2xl animate-pulse">
       {/* Thumbnail placeholder */}
-      <div className="w-full h-[180px] bg-neutral-900 border-b border-neutral-850" />
+      <div className="w-full h-[180px] bg-neutral-900 border-b border-neutral-900" />
       
       {/* Body placeholder */}
       <div className="p-6 space-y-5">
@@ -283,7 +251,7 @@ export function BriefCardSkeleton(): React.JSX.Element {
           <div className="h-3 bg-neutral-950 rounded w-1/4" />
         </div>
 
-        <hr className="border-neutral-800" />
+        <hr className="border-neutral-900" />
 
         {/* 2-Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -312,13 +280,13 @@ interface BriefCardErrorProps {
 
 export function BriefCardError({ error, onRetry }: BriefCardErrorProps): React.JSX.Element {
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-xl border border-neutral-800 bg-[#0c0c0e] p-8 text-center space-y-4 shadow-2xl flex flex-col items-center justify-center">
+    <div className="w-full max-w-2xl mx-auto rounded-xl border border-neutral-900 bg-neutral-950 p-8 text-center space-y-4 shadow-2xl flex flex-col items-center justify-center">
       <div className="text-red-500 font-medium text-sm leading-relaxed max-w-md">
         {error}
       </div>
       <button
         onClick={onRetry}
-        className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-800 rounded-lg text-xs font-medium cursor-pointer transition-colors duration-200 active:scale-[0.98]"
+        className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-foreground border border-neutral-900 rounded-lg text-xs font-medium cursor-pointer transition-colors duration-200 active:scale-[0.98]"
       >
         Try again
       </button>

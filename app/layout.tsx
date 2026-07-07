@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Reframe — AI Engagement Comment Seeding",
-  description: "Lightweight AI tool that generates realistic, human-sounding engagement comments for short-form video content.",
+  title: "Reframe — AI Video Briefing & Script Generator",
+  description: "Turn reference videos into structured, high-conversion creative briefs and scripts using AI.",
 };
 
 export default function RootLayout({
