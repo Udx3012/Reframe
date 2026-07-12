@@ -22,7 +22,7 @@ Analyze this video as a creative director briefing a motion designer. Return ONL
 
 {
   "topic": "one sentence — what this video is about",
-  "hook": "describe exactly what happens in the first 5 seconds and what technique makes it compelling",
+  "hook": "describe what happens in the opening and what technique makes it compelling, starting with 'The opening' instead of explicitly mentioning 'the first 5 seconds'",
   "caption_style": "one of: kinetic text / static lower thirds / word-by-word / subtitles only / no captions / mixed",
   "motion_profile": "one of: linear cuts / 3D motion heavy / parallax / mixed live-action / minimal static",
   "pacing": "one of: fast (20+ cuts/min) / medium (8-20 cuts/min) / slow (under 8 cuts/min)",

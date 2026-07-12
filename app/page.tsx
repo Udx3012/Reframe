@@ -4,12 +4,72 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from '@/components/Header';
 import VideoInput, { InputModuleState } from '@/components/reframe/video-input';
 import BriefCard, { BriefCardSkeleton, BriefCardError } from '@/components/reframe/brief-card';
-import { Sparkles, Loader2, ArrowRight, Play, Cpu, CheckCircle } from 'lucide-react';
+import { Sparkles, Loader2, ArrowRight, Play, Cpu, CheckCircle, X } from 'lucide-react';
 import { ReframeOutput } from '@/lib/types';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const modalContent = {
+  privacy: {
+    title: 'Privacy Policy',
+    content: (
+      <>
+        <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed mb-4">
+          At Reframe, privacy is our core foundation. We process all reference videos in real-time within highly secure, isolated sessions.
+        </p>
+        <ul className="list-disc list-inside text-neutral-400 text-xs sm:text-sm space-y-2 mb-4">
+          <li>No video binaries or frame captures are stored on our servers.</li>
+          <li>Extracted briefs are sent directly to your browser and never cached.</li>
+          <li>We do not track or share your upload history with any third parties.</li>
+        </ul>
+        <p className="text-neutral-500 text-[11px] font-mono">
+          Last updated: July 2026
+        </p>
+      </>
+    )
+  },
+  terms: {
+    title: 'Terms of Service',
+    content: (
+      <>
+        <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed mb-4">
+          By using Reframe, you agree to these simple and transparent terms of service:
+        </p>
+        <ul className="list-disc list-inside text-neutral-400 text-xs sm:text-sm space-y-2 mb-4">
+          <li>You retain full ownership and intellectual property of your reference videos and generated briefs.</li>
+          <li>You warrant that you possess the necessary rights and permissions for any uploaded media or imported links.</li>
+          <li>Reframe is provided "as is" to streamline your creative process.</li>
+        </ul>
+        <p className="text-neutral-500 text-[11px] font-mono">
+          Last updated: July 2026
+        </p>
+      </>
+    )
+  },
+  security: {
+    title: 'Security Disclosure',
+    content: (
+      <>
+        <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed mb-4">
+          We maintain strict security safeguards to keep your creative assets and operations protected:
+        </p>
+        <ul className="list-disc list-inside text-neutral-400 text-xs sm:text-sm space-y-2 mb-4">
+          <li>All uploaded files and YouTube stream requests are encrypted using TLS 1.3 in transit.</li>
+          <li>Dynamic analysis runs in standard sandbox environments with immediate teardown on completion.</li>
+          <li>We proactively monitor and regularly audit our AI pipeline interfaces to ensure robust execution.</li>
+        </ul>
+        <p className="text-neutral-500 text-[11px] font-mono">
+          Last updated: July 2026
+        </p>
+      </>
+    )
+  }
+};
+
 export default function Page() {
+  // Modal State
+  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'security' | null>(null);
+
   // Global Media States
   const [isValid, setIsValid] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -85,7 +145,7 @@ export default function Page() {
       cardSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
 
-    toast.loading('Ingesting video metadata parameters...', {
+    toast.loading('Analysing...', {
       id: 'analysis-toast',
       style: { background: '#0a0a0a', borderColor: '#1f1f1f', color: '#fff' }
     });
@@ -191,7 +251,7 @@ export default function Page() {
                 </span>
               </h1>
               <p className="text-neutral-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                Ingest reference video layouts, audio transcripts, visual pacing, and targeted branding prompts. Automatically extract comprehensive, production-ready creative briefs powered by AI.
+                Analyze reference video layouts, audio transcripts, visual pacing, and targeted branding prompts. Automatically extract comprehensive, production-ready creative briefs powered by AI.
               </p>
             </div>
 
@@ -208,27 +268,40 @@ export default function Page() {
             {/* Extra Professional Features Section */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-2xl border-t border-neutral-900 pt-12 mt-4 text-left">
               <div className="space-y-1.5">
-                <h3 className="text-xs font-mono font-bold text-foreground uppercase">Visual Ingestion</h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">Supports drag & drop MP4/MOV references or direct YouTube stream feeds.</p>
+                <h3 className="text-xs font-mono font-bold text-foreground uppercase">Universal Video Support</h3>
+                <p className="text-xs text-neutral-500 leading-relaxed">Drag & drop MP4 and MOV files directly, or instantly import reference videos using YouTube links.</p>
               </div>
               <div className="space-y-1.5">
-                <h3 className="text-xs font-mono font-bold text-foreground uppercase">Structured Output</h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">Retrieves copy suggestions, audio guidelines, style palettes, and outlines.</p>
+                <h3 className="text-xs font-mono font-bold text-foreground uppercase">AI-Powered Blueprints</h3>
+                <p className="text-xs text-neutral-500 leading-relaxed">Generate production-ready script outlines, voiceover directions, and visual style palettes in seconds.</p>
               </div>
               <div className="space-y-1.5">
-                <h3 className="text-xs font-mono font-bold text-foreground uppercase">Stateless Run</h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">Secure sandbox session with automatic prompt-context garbage collection.</p>
+                <h3 className="text-xs font-mono font-bold text-foreground uppercase">Private by Design</h3>
+                <p className="text-xs text-neutral-500 leading-relaxed">Your files are analyzed in a secure, stateless session and deleted as soon as processing completes.</p>
               </div>
             </div>
 
             {/* Professional Footer for Landing View */}
             <footer className="w-full border-t border-neutral-900 pt-8 pb-4 mt-16 text-center text-xs text-neutral-600 select-none">
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-4 font-mono">
-                <a href="#privacy" className="hover:text-neutral-400 transition-colors">Privacy Policy</a>
-                <a href="#terms" className="hover:text-neutral-400 transition-colors">Terms of Service</a>
-                <a href="#security" className="hover:text-neutral-400 transition-colors">Security Disclosure</a>
-                <a href="#docs" className="hover:text-neutral-400 transition-colors">Documentation</a>
-                <a href="#status" className="hover:text-neutral-400 transition-colors">API Status</a>
+                <button 
+                  onClick={() => setActiveModal('privacy')} 
+                  className="hover:text-neutral-400 transition-colors cursor-pointer bg-transparent border-none text-xs font-mono"
+                >
+                  Privacy Policy
+                </button>
+                <button 
+                  onClick={() => setActiveModal('terms')} 
+                  className="hover:text-neutral-400 transition-colors cursor-pointer bg-transparent border-none text-xs font-mono"
+                >
+                  Terms of Service
+                </button>
+                <button 
+                  onClick={() => setActiveModal('security')} 
+                  className="hover:text-neutral-400 transition-colors cursor-pointer bg-transparent border-none text-xs font-mono"
+                >
+                  Security Disclosure
+                </button>
               </div>
               <p className="text-[10px] font-mono">
                 © 2026 Reframe. Powered by HalftoneMotion. All rights reserved.
@@ -436,6 +509,43 @@ export default function Page() {
               </div>
             </footer>
           </motion.main>
+        )}
+      </AnimatePresence>
+
+      {/* Interactive Policy Modal Overlay */}
+      <AnimatePresence>
+        {activeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveModal(null)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 cursor-pointer"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 10, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-neutral-950 border border-neutral-900 rounded-2xl p-6 max-w-md w-full relative cursor-default shadow-2xl"
+            >
+              <button
+                onClick={() => setActiveModal(null)}
+                className="absolute top-4 right-4 text-neutral-400 hover:text-foreground transition-colors cursor-pointer p-1 rounded-lg hover:bg-neutral-900"
+              >
+                <X className="size-4" />
+              </button>
+              
+              <h3 className="text-base font-semibold text-foreground mb-4">
+                {modalContent[activeModal].title}
+              </h3>
+              
+              <div className="text-left space-y-4">
+                {modalContent[activeModal].content}
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

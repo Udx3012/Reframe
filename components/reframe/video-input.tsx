@@ -22,7 +22,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
   // Primary Media Ingestion States
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
-  
+
   // Text Context Input
   const [description, setDescription] = useState('');
 
@@ -37,7 +37,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
 
   // Derived States: Mode and Validation
   const hasMedia = !!(videoFile || (videoUrl && detectedPlatform && !urlError));
-  
+
   const mode: 'enhancement' | null = hasMedia && description.trim() ? 'enhancement' : null;
 
   const primaryType: 'video' | 'url' | null = videoFile
@@ -153,7 +153,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       validateAndSetFile(e.dataTransfer.files[0]);
     }
@@ -179,7 +179,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
 
   return (
     <div className="card-premium space-y-6" role="region" aria-label="Ingestion Console">
-      
+
       {/* Title & info */}
       <div className="space-y-1">
         <label className="text-[12px] font-mono font-bold uppercase tracking-wider text-foreground block">
@@ -190,15 +190,72 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
         </p>
       </div>
 
-      {/* 1. Upload Video File (Primary Ingest) */}
+      {/* 1. Paste Video URL (Primary Ingest) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-1.5 text-[12px] font-mono font-bold text-foreground animate-pulse-subtle">
+          <label htmlFor="url-input-field" className="flex items-center gap-1.5 text-[12px] font-mono font-bold text-foreground animate-pulse-subtle">
+            <span className={`h-1.5 w-1.5 rounded-full ${videoUrl && detectedPlatform && !urlError ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]' : 'bg-neutral-800'}`} />
+            1. PASTE VIDEO URL
+          </label>
+          {videoUrl && (
+            <button
+              onClick={clearUrl}
+              className="text-[10px] font-mono text-rose-500 hover:text-rose-455 flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <Trash2 className="size-3" /> Clear URL
+            </button>
+          )}
+        </div>
+
+        <div className={`relative ${videoFile ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+          <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-neutral-500">
+            <Link2 className="size-3.5" />
+          </span>
+          <input
+            id="url-input-field"
+            type="url"
+            value={videoUrl}
+            onChange={(e) => handleUrlChange(e.target.value)}
+            disabled={!!videoFile}
+            placeholder="Add YouTube link..."
+            className={`w-full text-sm bg-neutral-950/60 border border-neutral-900 rounded-lg pl-9 pr-24 py-2.5 text-foreground placeholder-neutral-500 focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700/20 outline-none font-mono transition-all duration-250 ${!videoUrl && !videoFile ? 'animate-glow-blink' : ''}`}
+            aria-invalid={!!urlError}
+          />
+
+          {detectedPlatform && !urlError && (
+            <div className="absolute inset-y-0 right-3 flex items-center gap-1.5 select-none">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-in fade-in duration-200">
+                <CheckCircle2 className="size-2.5" />
+                {detectedPlatform}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {urlError && (
+          <div className="flex items-start gap-1.5 text-[11px] leading-relaxed text-rose-500 animate-in fade-in duration-200" role="alert">
+            <AlertCircle className="size-3.5 shrink-0 mt-0.5" />
+            <span>{urlError}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Mutual exclusion indicator */}
+      <div className="flex items-center gap-2.5 py-0.5">
+        <div className="h-px bg-neutral-900/60 flex-1" />
+        <span className="text-[9px] font-mono tracking-widest text-neutral-800">OR</span>
+        <div className="h-px bg-neutral-900/60 flex-1" />
+      </div>
+
+      {/* 2. Upload Video File (Secondary Ingest) */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-1.5 text-[12px] font-mono font-bold text-foreground">
             <span className={`h-1.5 w-1.5 rounded-full ${videoFile ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]' : 'bg-neutral-800'}`} />
-            1. UPLOAD VIDEO (PRIMARY)
+            2. UPLOAD VIDEO
           </label>
           {videoFile && (
-            <button 
+            <button
               onClick={clearFile}
               className="text-[10px] font-mono text-rose-500 hover:text-rose-455 flex items-center gap-1 transition-colors cursor-pointer"
             >
@@ -207,7 +264,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
           )}
         </div>
 
-        <input 
+        <input
           ref={fileInputRef}
           type="file"
           accept="video/mp4,video/quicktime,video/webm"
@@ -222,9 +279,9 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
 
         {videoPreviewUrl ? (
           <div className="relative rounded-lg border border-neutral-900 bg-black overflow-hidden aspect-video">
-            <video 
-              src={videoPreviewUrl} 
-              controls 
+            <video
+              src={videoPreviewUrl}
+              controls
               className="w-full h-full object-cover"
               aria-label="Uploaded video preview player"
             />
@@ -240,11 +297,10 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
             onClick={() => {
               if (!videoUrl) fileInputRef.current?.click();
             }}
-            className={`border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300 group ${
-              isDragging 
-                ? 'border-emerald-500 bg-emerald-950/5' 
+            className={`border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300 group ${isDragging
+                ? 'border-emerald-500 bg-emerald-950/5'
                 : 'border-neutral-900 bg-neutral-950/20 hover:border-neutral-750 hover:bg-neutral-950/50 hover:shadow-[inset_0_0_15px_rgba(255,255,255,0.02)]'
-            } ${videoUrl ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}
+              } ${videoUrl ? 'opacity-40 pointer-events-none' : 'opacity-100'} ${!videoUrl && !videoFile && !isDragging ? 'animate-glow-blink' : ''}`}
             role="button"
             tabIndex={videoUrl ? -1 : 0}
             aria-label="Upload raw video file"
@@ -265,63 +321,6 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
           <div className="flex items-center gap-1.5 text-[11px] text-rose-500 animate-in fade-in duration-200" role="alert">
             <AlertCircle className="size-3.5" />
             <span>{fileError}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Mutual exclusion indicator */}
-      <div className="flex items-center gap-2.5 py-0.5">
-        <div className="h-px bg-neutral-900/60 flex-1" />
-        <span className="text-[9px] font-mono tracking-widest text-neutral-800">OR</span>
-        <div className="h-px bg-neutral-900/60 flex-1" />
-      </div>
-
-      {/* 2. social Video URL (Secondary Ingest) */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label htmlFor="url-input-field" className="flex items-center gap-1.5 text-[12px] font-mono font-bold text-foreground">
-            <span className={`h-1.5 w-1.5 rounded-full ${videoUrl && detectedPlatform && !urlError ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]' : 'bg-neutral-800'}`} />
-            2. PASTE VIDEO URL (SECONDARY)
-          </label>
-          {videoUrl && (
-            <button 
-              onClick={clearUrl}
-              className="text-[10px] font-mono text-rose-500 hover:text-rose-455 flex items-center gap-1 transition-colors cursor-pointer"
-            >
-              <Trash2 className="size-3" /> Clear URL
-            </button>
-          )}
-        </div>
-
-        <div className={`relative ${videoFile ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-          <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-neutral-500">
-            <Link2 className="size-3.5" />
-          </span>
-          <input
-            id="url-input-field"
-            type="url"
-            value={videoUrl}
-            onChange={(e) => handleUrlChange(e.target.value)}
-            disabled={!!videoFile}
-            placeholder="YouTube, TikTok, or Instagram Reels link..."
-            className="w-full text-sm bg-neutral-950/60 border border-neutral-900 rounded-lg pl-9 pr-24 py-2.5 text-foreground placeholder-neutral-500 focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700/20 outline-none font-mono transition-all duration-250"
-            aria-invalid={!!urlError}
-          />
-          
-          {detectedPlatform && !urlError && (
-            <div className="absolute inset-y-0 right-3 flex items-center gap-1.5 select-none">
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-in fade-in duration-200">
-                <CheckCircle2 className="size-2.5" />
-                {detectedPlatform}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {urlError && (
-          <div className="flex items-start gap-1.5 text-[11px] leading-relaxed text-rose-500 animate-in fade-in duration-200" role="alert">
-            <AlertCircle className="size-3.5 shrink-0 mt-0.5" />
-            <span>{urlError}</span>
           </div>
         )}
       </div>
@@ -349,7 +348,7 @@ export default function VideoInput({ onChange, onValidationChange }: InputModule
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter brand rules, target keywords, or styling context overrides to analyze alongside the media..."
-          className="w-full text-sm bg-neutral-950/60 border border-neutral-900 rounded-lg p-3 text-foreground placeholder-neutral-500 focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700/20 outline-none resize-none leading-relaxed transition-all duration-250"
+          className={`w-full text-sm bg-neutral-950/60 border border-neutral-900 rounded-lg p-3 text-foreground placeholder-neutral-500 focus:border-neutral-600 focus:ring-1 focus:ring-neutral-700/20 outline-none resize-none leading-relaxed transition-all duration-250 ${!description ? 'animate-glow-blink' : ''}`}
         />
 
         {/* Supplemental description context helper */}
