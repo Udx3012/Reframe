@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { UploadCloud, Link2, AlertCircle, CheckCircle2, Trash2, HelpCircle, Sparkles, BookOpen } from 'lucide-react';
+import { UploadCloud, Link2, AlertCircle, CheckCircle2, Trash2, HelpCircle } from 'lucide-react';
 
 import { parseYouTubeUrl } from '@/lib/parseUrl';
 

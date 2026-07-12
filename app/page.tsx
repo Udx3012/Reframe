@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from '@/components/Header';
 import VideoInput, { InputModuleState } from '@/components/reframe/video-input';
 import BriefCard, { BriefCardSkeleton, BriefCardError } from '@/components/reframe/brief-card';
-import { Sparkles, Loader2, ArrowRight, Play, Cpu, CheckCircle, X } from 'lucide-react';
+import { Sparkles, Loader2, ArrowRight, X } from 'lucide-react';
 import { ReframeOutput } from '@/lib/types';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,7 +38,7 @@ const modalContent = {
         <ul className="list-disc list-inside text-neutral-400 text-xs sm:text-sm space-y-2 mb-4">
           <li>You retain full ownership and intellectual property of your reference videos and generated briefs.</li>
           <li>You warrant that you possess the necessary rights and permissions for any uploaded media or imported links.</li>
-          <li>Reframe is provided "as is" to streamline your creative process.</li>
+          <li>Reframe is provided &quot;as is&quot; to streamline your creative process.</li>
         </ul>
         <p className="text-neutral-500 text-[11px] font-mono">
           Last updated: July 2026
@@ -483,7 +483,7 @@ export default function Page() {
                         <div className="space-y-1">
                           <h3 className="text-sm font-medium text-foreground">Awaiting Ingestion</h3>
                           <p className="text-xs text-neutral-500 max-w-xs leading-relaxed">
-                            Configure the media ingestion on the left and click "Generate Brief" to run the intelligence report.
+                            Configure the media ingestion on the left and click &quot;Generate Brief&quot; to run the intelligence report.
                           </p>
                         </div>
                       </motion.div>

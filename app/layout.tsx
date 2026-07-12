@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Reframe — AI Video Briefing & Script Generator",
+  title: "Reframe — AI Video Briefing Tool",
   description: "Turn reference videos into structured, high-conversion creative briefs and scripts using AI.",
 };
 
